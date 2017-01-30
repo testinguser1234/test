@@ -1,0 +1,15 @@
+{
+  "name": "node_test",
+  "version": "1.0.0",
+  "description": "test node app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "pasalo92",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^2.2.19",
+    "express": "3.x"
+  }
+}
