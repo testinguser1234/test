@@ -5,11 +5,11 @@ var Server = mongo.Server,
     BSON = mongo.BSONPure;
 
 var server = new Server('localhost', 27017, {auto_reconnect: true});
-db = new Db('demoworkdb', server);
+db = new Db('admin', server);
 
 db.open(function(err, db) {
   if(!err) {
-    console.log("Connected to 'demoworkdb' database");
+    console.log("Connected to 'admin' database");
     db.collection('markers', {strict:true}, function(err, collection) {
       if (err) {
         console.log("The 'markers' collection doesn't exist. Creating it with sample data...");
@@ -66,13 +66,15 @@ var populateDB = function() {
     {
       latLng: {
         lat: 31.93351676190369,
-        lng: -115.8343505859375
+        lng: -115.8343505859375,
+        markerNum: 1
       }
     },
     {
       latLng: {
         lat: 31.821564514920738,
-        lng: -116.5594482421875
+        lng: -116.5594482421875,
+        markerNum: 2
       }
     }];
 
