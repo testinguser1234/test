@@ -4,12 +4,12 @@ var Server = mongo.Server,
     Db = mongo.Db,
     BSON = mongo.BSONPure;
 
-var server = new Server('localhost', 27017, {auto_reconnect: true});
-db = new Db('admin', server);
+var server = new Server('ec2-54-215-205-127.us-west-1.compute.amazonaws.com', 27017, {auto_reconnect: true});
+db = new Db('pasalo92DB', server);
 
 db.open(function(err, db) {
   if(!err) {
-    console.log("Connected to 'admin' database");
+    console.log("Connected to 'pasalo92DB' database");
     db.collection('markers', {strict:true}, function(err, collection) {
       if (err) {
         console.log("The 'markers' collection doesn't exist. Creating it with sample data...");
