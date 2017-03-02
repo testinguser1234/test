@@ -1,11 +1,12 @@
-var mongo = require('mongodb');
+var mongo = require('mongodb'),
+    bodyParser = require('body-parser');
+
 
 var Server = mongo.Server,
     Db = mongo.Db,
     BSON = mongo.BSONPure;
 
-// var server = new Server('ec2-54-215-205-127.us-west-1.compute.amazonaws.com', 27017, {auto_reconnect: true});
-var server = new Server('localhost', 27017, {auto_reconnect: true});
+var server = new Server(process.env.DB, 27017, {auto_reconnect: true});
 db = new Db('pasalo92DB', server);
 
 db.open(function(err, db) {
@@ -23,13 +24,14 @@ db.open(function(err, db) {
 
 exports.findAll = function(req, res) {
   db.collection('markers', function(err, collection) {
-    collection.find().toArray(function(err, items) {
+    collection.find( { user: req.params.user } ).toArray(function(err, items) {
       res.send(items);
     });
   });
 };
 
 exports.addOrDelMarker = function(req, res) {
+
   var marker = req.body;
   //console.log('Adding marker: ' + JSON.stringify(marker));
   db.collection('markers', function(err, collection) {

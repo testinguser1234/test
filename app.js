@@ -3,7 +3,7 @@ var express = require('express'),
     logger = require('morgan'),
     http = require('http'),
     bodyParser = require('body-parser'),
-    dotenv = require('dotenv');
+    dotenv = require('dotenv'),
     errorhandler = require('errorhandler');
 
 var app = express();
@@ -20,7 +20,7 @@ app.use(require('./photos'));
 
 marker = require('./markers'),
 
-app.get('/markers', marker.findAll);
+app.get('/markers/:user', marker.findAll);
 app.post('/markers', marker.addOrDelMarker);
 
 app.use(function (err, req, res, next) {
@@ -35,7 +35,7 @@ app.use(function (err, req, res, next) {
 var port = process.env.PORT || 8080;
 
 http.createServer(app).listen(port, function (err) {
-    console.log('listening in http://localhost:' + port);
+    console.log('listening in ' + process.env.PRODURL + ':' + port);
 });
 
 

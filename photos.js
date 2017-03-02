@@ -1,17 +1,34 @@
 var express = require('express'),
     _       = require('lodash'),
     aws     = require('aws-sdk'),
-    awsPromised = require('aws-promised');
+    awsPromised = require('aws-promised'),
+    multer = require('multer'),
+    multerS3 = require('multer-s3');
+
+aws.config.update({accessKeyId: process.env.ACCESSKEY, secretAccessKey: process.env.SECRETACCESSKEY});
+var s3 = awsPromised.s3();
+
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'pasalo92imageupload',
+    metadata: function (req, file, cb) {
+      cb(null, {fieldName: file.fieldname});
+    },
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString())
+    }
+  })
+});
 
 var app = module.exports = express.Router();
 
-aws.config.update({accessKeyId: '', secretAccessKey: ''});
-var s3 = awsPromised.s3();
+app.get('/photos/get/:marker/:user', function(req, res) {
 
-app.get('/photos/get/:marker', function(req, res) {
-
+  console.log(req.params);
+  
   var params = {
-    Bucket: 'pasalo92imageupload',
+    Bucket: req.params.user + 'imageupload',
     Prefix:  req.params.marker + "/"
   };
 
@@ -26,10 +43,29 @@ app.get('/photos/get/:marker', function(req, res) {
 
 });
 
+
+app.post('/bucket', function(req, res) {
+
+  var params = {
+    Bucket: req.body.bucket + 'imageupload',
+    ACL: 'public-read-write',
+  };
+
+  s3.createBucket(params, function(err, data) {
+    if (err) {
+      res.send("Error", err);
+    } else {
+      res.send("Success");
+    }
+  });
+
+});
+
+
 app.post('/album/delete', function (req, res) {
 
     var params = {
-      Bucket: 'pasalo92imageupload',
+      Bucket: req.body.user + 'imageupload',
       Prefix: req.body.album + "/"
     };
 
@@ -42,7 +78,7 @@ app.post('/album/delete', function (req, res) {
         return;
       }
 
-      params = {Bucket: 'pasalo92imageupload'};
+      params = {Bucket: req.body.user + 'imageupload'};
       params.Delete = {Objects: []};
 
       data.Contents.forEach(function (content) {
@@ -61,7 +97,7 @@ app.post('/album/delete', function (req, res) {
 
 app.post('/photo/delete', function (req, res) {
   var params = {
-    Bucket: 'pasalo92imageupload',
+    Bucket: req.body.user + 'imageupload',
     Key: req.body.photo
   };
 
@@ -76,7 +112,27 @@ app.post('/photo/delete', function (req, res) {
 });
 
 
-app.post('/photo/upload', function (req, res) {
+app.post('/photo/upload', upload.array('file'), function (req, res) {
+
+  console.log(req.file);
+  console.log(req.body);
+  // var path = req.files.image.path;
+  // fs.readFile(path, function(err, file_buffer){
+  //   var params = {
+  //     Bucket: 'makersquest',
+  //     Key: 'myKey1234.png',
+  //     Body: file_buffer
+  //   };
+  //
+  //   s3.putObject(params, function (perr, pres) {
+  //     if (perr) {
+  //       console.log("Error uploading data: ", perr);
+  //     } else {
+  //       console.log("Successfully uploaded data to myBucket/myKey");
+  //     }
+  //   });
+  // });
+
 
   var uniqueString = function () {
     var text = "";
