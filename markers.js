@@ -47,9 +47,7 @@ exports.addOrDelMarker = function(req, res) {
       });
 
     } else {
-
-      console.log(marker.latLng);
-
+      
       collection.findOneAndDelete(
 
           {"latLng": marker.latLng}

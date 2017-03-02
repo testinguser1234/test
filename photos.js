@@ -49,6 +49,9 @@ app.post('/bucket', function(req, res) {
   var params = {
     Bucket: req.body.bucket + 'imageupload',
     ACL: 'public-read-write',
+    CreateBucketConfiguration: {
+      LocationConstraint: 'us-west-1'
+    }
   };
 
   s3.createBucket(params, function(err, data) {
@@ -56,6 +59,66 @@ app.post('/bucket', function(req, res) {
       res.send("Error", err);
     } else {
       res.send("Success");
+
+      var policyJson = {
+        "Version": "2012-10-17",
+        "Id": "Policy1483511424050",
+        "Statement": [
+          {
+            "Sid": "Stmt1483511411174",
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": "*"
+            },
+            "Action": [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::" + req.body.bucket + "imageupload/*"
+          }
+        ]
+      }
+
+      var policyParams = {
+        Bucket: req.body.bucket + 'imageupload',
+        Policy: JSON.stringify(policyJson)
+      };
+      s3.putBucketPolicy(policyParams, function(err, data) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          var corsParams = {
+            Bucket: req.body.bucket + 'imageupload',
+            CORSConfiguration: {
+              CORSRules: [
+                {
+                  AllowedMethods: [
+                    'GET',
+                    'POST',
+                    'PUT',
+                    'DELETE'
+                  ],
+                  AllowedOrigins: [
+                    '*'
+                  ],
+                  AllowedHeaders: [
+                    '*'
+                  ],
+                  MaxAgeSeconds: 3000
+                }
+              ]
+            }
+          };
+          s3.putBucketCors(corsParams, function(err, data) {
+            if (err) {
+              console.log(err); // an error occurred
+            }
+          });
+        }
+      });
     }
   });
 
