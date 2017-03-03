@@ -1,32 +1,16 @@
 var express = require('express'),
     _       = require('lodash'),
     aws     = require('aws-sdk'),
-    awsPromised = require('aws-promised'),
-    multer = require('multer'),
-    multerS3 = require('multer-s3');
+    awsPromised = require('aws-promised');
+
 
 aws.config.update({accessKeyId: process.env.ACCESSKEY, secretAccessKey: process.env.SECRETACCESSKEY});
 var s3 = awsPromised.s3();
-
-var upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'pasalo92imageupload',
-    metadata: function (req, file, cb) {
-      cb(null, {fieldName: file.fieldname});
-    },
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString())
-    }
-  })
-});
 
 var app = module.exports = express.Router();
 
 app.get('/photos/get/:marker/:user', function(req, res) {
 
-  console.log(req.params);
-  
   var params = {
     Bucket: req.params.user + 'imageupload',
     Prefix:  req.params.marker + "/"
@@ -174,83 +158,94 @@ app.post('/photo/delete', function (req, res) {
 
 });
 
+app.get('/env', function (req, res) {
 
-app.post('/photo/upload', upload.array('file'), function (req, res) {
-
-  console.log(req.file);
-  console.log(req.body);
-  // var path = req.files.image.path;
-  // fs.readFile(path, function(err, file_buffer){
-  //   var params = {
-  //     Bucket: 'makersquest',
-  //     Key: 'myKey1234.png',
-  //     Body: file_buffer
-  //   };
-  //
-  //   s3.putObject(params, function (perr, pres) {
-  //     if (perr) {
-  //       console.log("Error uploading data: ", perr);
-  //     } else {
-  //       console.log("Successfully uploaded data to myBucket/myKey");
-  //     }
-  //   });
-  // });
-
-
-  var uniqueString = function () {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for (var i = 0; i < 8; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  };
-
-  if (req.body.photo) {
-
-    var fileSize = Math.round(parseInt(req.body.photo.size, 10));
-    if (fileSize > 1058576) {
-      res.send('Sorry, your attachment is too big. Maximum 1MB file attachment allowed');
-      return false;
-    }
-
-    // Prepend Unique String To Prevent Overwrites
-    var uniqueFileName = uniqueString() + '-' + req.body.photo.name;
-
-    var params = {
-      Key: req.body.markNum.toString() + "/" + uniqueFileName,
-      ContentType: req.body.photo.type,
-      Body: req.body.photo,
-      ServerSideEncryption: 'AES256',
-      Bucket: 'pasalo92imageupload'
-    };
-
-    s3.putObject(params, function (err) {
-      if (err) {
-        res.send(err.message);
-        return false;
-      }
-      else {
-        // Upload Successfully Finished
-        res.send('File Uploaded Successfully');
-        // callBucket();
-        // $scope.uploadProgress = 0;
-        // $scope.$digest();
-        // $scope.showProgress = false;
-      }
-    });
-        // .on('httpUploadProgress', function (progress) {
-        //   $scope.showProgress = true;
-        //   $scope.uploadProgress = Math.round(progress.loaded / progress.total * 100);
-        //   $scope.$digest();
-        // });
+  var env = {
+    ak: process.env.ACCESSKEY + "PSL",
+    sk: process.env.SECRETACCESSKEY + "Gg"
   }
-  else {
-    // No File Selected
-    res.send('Please select a file to upload');
-  }
+
+  res.send(env);
 
 });
+
+
+// app.post('/photo/upload', upload.array('file'), function (req, res) {
+//
+//   console.log(req.file);
+//   console.log(req.body);
+//   // var path = req.files.image.path;
+//   // fs.readFile(path, function(err, file_buffer){
+//   //   var params = {
+//   //     Bucket: 'makersquest',
+//   //     Key: 'myKey1234.png',
+//   //     Body: file_buffer
+//   //   };
+//   //
+//   //   s3.putObject(params, function (perr, pres) {
+//   //     if (perr) {
+//   //       console.log("Error uploading data: ", perr);
+//   //     } else {
+//   //       console.log("Successfully uploaded data to myBucket/myKey");
+//   //     }
+//   //   });
+//   // });
+//
+//
+//   var uniqueString = function () {
+//     var text = "";
+//     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+//
+//     for (var i = 0; i < 8; i++) {
+//       text += possible.charAt(Math.floor(Math.random() * possible.length));
+//     }
+//     return text;
+//   };
+//
+//   if (req.body.photo) {
+//
+//     var fileSize = Math.round(parseInt(req.body.photo.size, 10));
+//     if (fileSize > 1058576) {
+//       res.send('Sorry, your attachment is too big. Maximum 1MB file attachment allowed');
+//       return false;
+//     }
+//
+//     // Prepend Unique String To Prevent Overwrites
+//     var uniqueFileName = uniqueString() + '-' + req.body.photo.name;
+//
+//     var params = {
+//       Key: req.body.markNum.toString() + "/" + uniqueFileName,
+//       ContentType: req.body.photo.type,
+//       Body: req.body.photo,
+//       ServerSideEncryption: 'AES256',
+//       Bucket: 'pasalo92imageupload'
+//     };
+//
+//     s3.putObject(params, function (err) {
+//       if (err) {
+//         res.send(err.message);
+//         return false;
+//       }
+//       else {
+//         // Upload Successfully Finished
+//         res.send('File Uploaded Successfully');
+//         // callBucket();
+//         // $scope.uploadProgress = 0;
+//         // $scope.$digest();
+//         // $scope.showProgress = false;
+//       }
+//     });
+//         // .on('httpUploadProgress', function (progress) {
+//         //   $scope.showProgress = true;
+//         //   $scope.uploadProgress = Math.round(progress.loaded / progress.total * 100);
+//         //   $scope.$digest();
+//         // });
+//   }
+//   else {
+//     // No File Selected
+//     res.send('Please select a file to upload');
+//   }
+//
+// });
 
 
