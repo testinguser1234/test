@@ -30,6 +30,27 @@ exports.findAll = function(req, res) {
   });
 };
 
+exports.addCaption = function (req, res) {
+  var cap = req.body.caption;
+
+  db.collection('markers', function (err, collection) {
+    collection.update(
+      { markerNum: parseInt(req.body.marker), user: req.body.user },
+      { $set: {caption: cap} },
+        {upsert: true}
+    ,function(err, doc){
+      if (err) {
+        console.log("error:" + err);
+      } else {
+        console.log("doc:" + doc);
+        res.send("Success!");
+      }
+    });
+
+  });
+
+};
+
 exports.addOrDelMarker = function(req, res) {
 
   var marker = req.body;
@@ -56,7 +77,7 @@ exports.addOrDelMarker = function(req, res) {
     }
 
   });
-}
+};
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 // Populate database with sample data -- Only used once: the first time the application is started.

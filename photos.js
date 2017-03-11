@@ -44,7 +44,7 @@ app.post('/album/delete', function (req, res) {
         return;
       }
 
-      params = 'pasalo92imageupload';
+      params = {Bucket: 'pasalo92imageupload'};
       params.Delete = {Objects: []};
 
       data.Contents.forEach(function (content) {
@@ -76,6 +76,7 @@ app.post('/photo/delete', function (req, res) {
   });
 
 });
+
 
 
 

@@ -22,6 +22,7 @@ marker = require('./markers'),
 
 app.get('/markers/:user', marker.findAll);
 app.post('/markers', marker.addOrDelMarker);
+app.post('/caption', marker.addCaption);
 
 app.use(function (err, req, res, next) {
     if (err.name === 'StatusError') {

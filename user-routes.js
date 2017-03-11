@@ -24,7 +24,7 @@ db.open(function(err, db) {
 });
 
 function createToken(user) {
-    return jwt.sign(_.omit(user, 'password'), 'test_secret', { expiresIn: 60*10 });
+    return jwt.sign(_.omit(user, 'password'), 'test_secret', { expiresIn: 60*300 });
 }
 
 app.post('/users', function(req, res) {
