@@ -12,7 +12,7 @@ var app = module.exports = express.Router();
 app.get('/photos/get/:marker/:user', function(req, res) {
 
   var params = {
-    Bucket:  'pasalo92imageupload',
+    Bucket:  process.env.MAPSBUCKET,
     Prefix:  req.params.user + "/" + req.params.marker + "/"
   };
 
@@ -31,7 +31,7 @@ app.get('/photos/get/:marker/:user', function(req, res) {
 app.post('/album/delete', function (req, res) {
 
     var params = {
-      Bucket: 'pasalo92imageupload',
+      Bucket: process.env.MAPSBUCKET,
       Prefix: req.body.user + "/" + req.body.album + "/"
     };
 
@@ -44,7 +44,7 @@ app.post('/album/delete', function (req, res) {
         return;
       }
 
-      params = {Bucket: 'pasalo92imageupload'};
+      params = {Bucket: process.env.MAPSBUCKET};
       params.Delete = {Objects: []};
 
       data.Contents.forEach(function (content) {
@@ -63,7 +63,7 @@ app.post('/album/delete', function (req, res) {
 
 app.post('/photo/delete', function (req, res) {
   var params = {
-    Bucket: 'pasalo92imageupload',
+    Bucket: process.env.MAPSBUCKET,
     Key: req.body.photo
   };
 
