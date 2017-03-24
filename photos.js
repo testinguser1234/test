@@ -9,11 +9,11 @@ var s3 = awsPromised.s3();
 
 var app = module.exports = express.Router();
 
-app.get('/photos/get/:marker/:user', function(req, res) {
+app.get('/photos/get/:tripNum/:marker/:user', function(req, res) {
 
   var params = {
     Bucket:  process.env.MAPSBUCKET,
-    Prefix:  req.params.user + "/" + req.params.marker + "/"
+    Prefix:  req.params.user + "/trip-" + req.params.tripNum + "/marker-" + req.params.marker + "/"
   };
 
   s3.listObjects(params, function (err,data) {
@@ -23,6 +23,23 @@ app.get('/photos/get/:marker/:user', function(req, res) {
       res.send(data);
     }
 
+  });
+
+});
+
+app.get('/profile/:user', function(req, res) {
+
+  var params = {
+    Bucket:  process.env.PROFILEBUCKET,
+    Prefix:  req.params.user + "/"
+  };
+
+  s3.listObjects(params, function (err,data) {
+    if(err) {
+      res.send(err);
+    } else {
+      res.send(data);
+    }
   });
 
 });
