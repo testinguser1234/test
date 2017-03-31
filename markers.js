@@ -22,13 +22,13 @@ db.open(function(err, db) {
 });
 
 
-exports.findAll = function(req, res) {
-  db.collection('markers', function(err, collection) {
-    collection.find( { user: req.params.user } ).toArray(function(err, items) {
-      res.send(items);
-    });
-  });
-};
+// exports.findAll = function(req, res) {
+//   db.collection('markers', function(err, collection) {
+//     collection.find( { user: req.params.user } ).toArray(function(err, items) {
+//       res.send(items);
+//     });
+//   });
+// };
 
 exports.findTrip = function(req, res) {
   db.collection('trips', function(err, collection) {
@@ -89,33 +89,33 @@ exports.addTrip = function (req, res) {
 
 
 
-exports.addOrDelMarker = function(req, res) {
-
-  var marker = req.body;
-  //console.log('Adding marker: ' + JSON.stringify(marker));
-  db.collection('markers', function(err, collection) {
-    if (marker.addOrDel == 'add') {
-
-      collection.insert(marker, {safe:true}, function(err, result) {
-        if (err) {
-          res.send({'error':'An error has occurred'});
-        } else {
-          console.log('Success: ' + JSON.stringify(result[0]));
-          res.send(result[0]);
-        }
-      });
-
-    } else {
-      
-      collection.findOneAndDelete(
-
-          {"latLng": marker.latLng}
-
-      );
-    }
-
-  });
-};
+// exports.addOrDelMarker = function(req, res) {
+//
+//   var marker = req.body;
+//   //console.log('Adding marker: ' + JSON.stringify(marker));
+//   db.collection('markers', function(err, collection) {
+//     if (marker.addOrDel == 'add') {
+//
+//       collection.insert(marker, {safe:true}, function(err, result) {
+//         if (err) {
+//           res.send({'error':'An error has occurred'});
+//         } else {
+//           console.log('Success: ' + JSON.stringify(result[0]));
+//           res.send(result[0]);
+//         }
+//       });
+//
+//     } else {
+//
+//       collection.findOneAndDelete(
+//
+//           {"latLng": marker.latLng}
+//
+//       );
+//     }
+//
+//   });
+// };
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 // Populate database with sample data -- Only used once: the first time the application is started.
