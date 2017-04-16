@@ -9,7 +9,7 @@ var Server = mongo.Server,
     Db = mongo.Db,
     BSON = mongo.BSONPure;
 
-var server = new Server(process.env.DB, 27017, {auto_reconnect: true});
+var server = new Server(process.env.DB2, 27017, {auto_reconnect: true});
 db = new Db('pasalo92DB', server);
 
 db.open(function(err, db) {
@@ -65,6 +65,43 @@ app.post('/users', function(req, res) {
 
 });
 
+app.post('/profile/edit', function (req, res) {
+    var profile = req.body;
+    //console.log('Adding marker: ' + JSON.stringify(marker));
+    db.collection('users', function (err, collection) {
+        //if (marker.addOrDel == 'add') {
+
+        collection.update(
+            {username: profile.username},
+            {$set: {
+                        fullName: profile.fullName,
+                        nationality: profile.nationality,
+                        dob: profile.dob
+                    }
+            },
+            {upsert: true}
+            , function (err, doc) {
+                if (err) {
+                    console.log("error:" + err);
+                } else {
+                    console.log("doc:" + doc);
+                    res.send("Success!");
+                }
+            });
+
+    });
+
+
+});
+
+app.get('/profile/:username', function(req, res) {
+    db.collection('users', function(err, collection) {
+        collection.findOne( { username: req.params.username }, function(err, items) {
+            res.send(items);
+        });
+    });
+});
+
 app.get('/users', function (req, res) {
     var users;
 
@@ -87,9 +124,8 @@ app.get('/users', function (req, res) {
         }
     });
 
-
-
 });
+
 
 app.post('/sessions/create', function(req, res) {
     var isAdmin = false;

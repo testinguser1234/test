@@ -27,7 +27,25 @@ app.get('/photos/get/:tripNum/:marker/:user', function(req, res) {
 
 });
 
-app.get('/profile/:user', function(req, res) {
+app.get('/photos/resize/get/:tripNum/:marker/:user', function(req, res) {
+
+  var params = {
+    Bucket:  process.env.RESIZEBUCKET,
+    Prefix:  req.params.user + "/trip-" + req.params.tripNum + "/marker-" + req.params.marker + "/"
+  };
+
+  s3.listObjects(params, function (err,data) {
+    if(err) {
+      res.send(err);
+    } else {
+      res.send(data);
+    }
+
+  });
+
+});
+
+app.get('/profile/image/:user', function(req, res) {
 
   var params = {
     Bucket:  process.env.PROFILEBUCKET,
@@ -81,6 +99,33 @@ app.post('/album/delete', function (req, res) {
 app.post('/photo/delete', function (req, res) {
   var params = {
     Bucket: process.env.MAPSBUCKET,
+    Key: req.body.photo
+  };
+
+  s3.deleteObject(params, function (err, data) {
+    if (err) {
+      res.send(err, err.stack);
+    } else {
+      res.send(req.body.photo + " has been deleted");
+    }
+  });
+
+  var paramsResize  = {
+    Bucket: process.env.RESIZEBUCKET,
+    Key: req.body.photo
+  };
+
+  s3.deleteObject(paramsResize, function (err, data) {
+    if (err) {
+      res.send(err, err.stack);
+    }
+  });
+
+});
+
+app.post('/profile/photo/delete', function (req, res) {
+  var params = {
+    Bucket: process.env.PROFILEBUCKET,
     Key: req.body.photo
   };
 
