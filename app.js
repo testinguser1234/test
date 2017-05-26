@@ -17,7 +17,7 @@ app.use(errorhandler());
 app.use(cors());
 app.use(require('./user-routes'));
 app.use(require('./photos'));
-
+console.log(testtttt);
 marker = require('./markers'),
 
 app.get('/trips/:user', marker.findTrip);
