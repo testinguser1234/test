@@ -20,10 +20,10 @@ app.use(require('./photos'));
 
 marker = require('./markers'),
 
-// app.get('/markers/:user', marker.findAll);
 app.get('/trips/:user', marker.findTrip);
 app.post('/trips', marker.addTrip);
-// app.post('/markers', marker.addOrDelMarker);
+app.post('/delete/trip', marker.deleteTrip);
+app.post('/markers', marker.deleteMarker);
 app.post('/caption', marker.addCaption);
 
 

@@ -1,6 +1,6 @@
 var express = require('express'),
-    _       = require('lodash'),
-    aws     = require('aws-sdk'),
+    _ = require('lodash'),
+    aws = require('aws-sdk'),
     awsPromised = require('aws-promised');
 
 
@@ -9,56 +9,56 @@ var s3 = awsPromised.s3();
 
 var app = module.exports = express.Router();
 
-app.get('/photos/get/:tripNum/:marker/:user', function(req, res) {
+app.get('/photos/get/:tripNum/:marker/:user', function (req, res) {
 
-  var params = {
-    Bucket:  process.env.MAPSBUCKET,
-    Prefix:  req.params.user + "/trip-" + req.params.tripNum + "/marker-" + req.params.marker + "/"
-  };
+    var params = {
+        Bucket: process.env.MAPSBUCKET,
+        Prefix: req.params.user + "/trip-" + req.params.tripNum + "/marker-" + req.params.marker + "/"
+    };
 
-  s3.listObjects(params, function (err,data) {
-    if(err) {
-      res.send(err);
-    } else {
-      res.send(data);
-    }
+    s3.listObjects(params, function (err, data) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(data);
+        }
 
-  });
-
-});
-
-app.get('/photos/resize/get/:tripNum/:marker/:user', function(req, res) {
-
-  var params = {
-    Bucket:  process.env.RESIZEBUCKET,
-    Prefix:  req.params.user + "/trip-" + req.params.tripNum + "/marker-" + req.params.marker + "/"
-  };
-
-  s3.listObjects(params, function (err,data) {
-    if(err) {
-      res.send(err);
-    } else {
-      res.send(data);
-    }
-
-  });
+    });
 
 });
 
-app.get('/profile/image/:user', function(req, res) {
+app.get('/photos/resize/get/:tripNum/:marker/:user', function (req, res) {
 
-  var params = {
-    Bucket:  process.env.PROFILEBUCKET,
-    Prefix:  req.params.user + "/"
-  };
+    var params = {
+        Bucket: process.env.RESIZEBUCKET,
+        Prefix: req.params.user + "/trip-" + req.params.tripNum + "/marker-" + req.params.marker + "/"
+    };
 
-  s3.listObjects(params, function (err,data) {
-    if(err) {
-      res.send(err);
-    } else {
-      res.send(data);
-    }
-  });
+    s3.listObjects(params, function (err, data) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(data);
+        }
+
+    });
+
+});
+
+app.get('/profile/image/:user', function (req, res) {
+
+    var params = {
+        Bucket: process.env.PROFILEBUCKET,
+        Prefix: req.params.user + "/"
+    };
+
+    s3.listObjects(params, function (err, data) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(data);
+        }
+    });
 
 });
 
@@ -66,76 +66,76 @@ app.get('/profile/image/:user', function(req, res) {
 app.post('/album/delete', function (req, res) {
 
     var params = {
-      Bucket: process.env.MAPSBUCKET,
-      Prefix: req.body.user + "/" + req.body.album + "/"
+        Bucket: process.env.MAPSBUCKET,
+        Prefix: req.body.user + "/" + req.body.album + "/"
     };
 
     s3.listObjects(params, function (err, data) {
-      if (err) {
-        console.log(err);
-      }
-
-      if (data.Contents.length === 0) {
-        return;
-      }
-
-      params = {Bucket: process.env.MAPSBUCKET};
-      params.Delete = {Objects: []};
-
-      data.Contents.forEach(function (content) {
-        params.Delete.Objects.push({Key: content.Key});
-      });
-
-      s3.deleteObjects(params, function (err, data) {
         if (err) {
-          console.log(err);
-          res.send("There was an error deleting the album");
+            console.log(err);
         }
-      });
+
+        if (data.Contents.length === 0) {
+            return;
+        }
+
+        params = {Bucket: process.env.MAPSBUCKET};
+        params.Delete = {Objects: []};
+
+        data.Contents.forEach(function (content) {
+            params.Delete.Objects.push({Key: content.Key});
+        });
+
+        s3.deleteObjects(params, function (err, data) {
+            if (err) {
+                console.log(err);
+                res.send("There was an error deleting the album");
+            }
+        });
     });
 
 });
 
 app.post('/photo/delete', function (req, res) {
-  var params = {
-    Bucket: process.env.MAPSBUCKET,
-    Key: req.body.photo
-  };
+    var params = {
+        Bucket: process.env.MAPSBUCKET,
+        Key: req.body.photo
+    };
 
-  s3.deleteObject(params, function (err, data) {
-    if (err) {
-      res.send(err, err.stack);
-    } else {
-      res.send(req.body.photo + " has been deleted");
-    }
-  });
+    s3.deleteObject(params, function (err, data) {
+        if (err) {
+            res.send(err, err.stack);
+        } else {
+            res.send(req.body.photo + " has been deleted");
+        }
+    });
 
-  var paramsResize  = {
-    Bucket: process.env.RESIZEBUCKET,
-    Key: req.body.photo
-  };
+    var paramsResize = {
+        Bucket: process.env.RESIZEBUCKET,
+        Key: req.body.photo
+    };
 
-  s3.deleteObject(paramsResize, function (err, data) {
-    if (err) {
-      res.send(err, err.stack);
-    }
-  });
+    s3.deleteObject(paramsResize, function (err, data) {
+        if (err) {
+            res.send(err, err.stack);
+        }
+    });
 
 });
 
 app.post('/profile/photo/delete', function (req, res) {
-  var params = {
-    Bucket: process.env.PROFILEBUCKET,
-    Key: req.body.photo
-  };
+    var params = {
+        Bucket: process.env.PROFILEBUCKET,
+        Key: req.body.photo
+    };
 
-  s3.deleteObject(params, function (err, data) {
-    if (err) {
-      res.send(err, err.stack);
-    } else {
-      res.send(req.body.photo + " has been deleted");
-    }
-  });
+    s3.deleteObject(params, function (err, data) {
+        if (err) {
+            res.send(err, err.stack);
+        } else {
+            res.send(req.body.photo + " has been deleted");
+        }
+    });
 
 });
 
